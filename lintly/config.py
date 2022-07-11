@@ -21,6 +21,7 @@ class Config(object):
             'post_status': self.post_status,
             'request_changes': self.request_changes,
             'github_check_run_id': self.github_check_run_id,
+            'review_body': self.review_body,
         }
 
     @property
@@ -58,6 +59,10 @@ class Config(object):
     @property
     def request_changes(self):
         return self.cli_config['request_changes']
+
+    @property
+    def review_body(self):
+        return self.cli_config['review_body']
 
     @property
     def github_check_run_id(self):
