@@ -1,5 +1,6 @@
 import collections
 import logging
+import os
 
 from .constants import (
     FAIL_ON_ANY,
@@ -70,6 +71,7 @@ class LintlyBuild(object):
         logger.info('Running Lintly against PR #{} for repo {}'.format(self.config.pr, self.project))
 
         parser = PARSERS.get(self.config.format)
+        parser._get_working_dir = lambda _: self.config.base_dir
         self._all_violations = parser.parse_violations(self.linter_output)
         logger.info('Lintly found violations in {} files'.format(len(self._all_violations)))
 
