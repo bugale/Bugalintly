@@ -7,7 +7,7 @@ import logging
 import gitlab
 import requests
 
-from lintly.constants import LINTLY_IDENTIFIER
+from lintly.config import Config
 
 from .base import BaseGitBackend
 from .errors import (
@@ -136,7 +136,7 @@ class GitLabBackend(BaseGitBackend):
         mr = project.mergerequests.list(iid=pr)[0]
         client = GitLabAPIClient(self.token, self.user, self.project)
         for note in mr.notes.list(all=True, per_page=DEFAULT_PER_PAGE):
-            if LINTLY_IDENTIFIER in note.body:
+            if Config.LINTLY_IDENTIFIER in note.body:
                 url = '/projects/{project_id}/merge_requests/{mr_id}/notes/{note_id}'.format(
                     project_id=project.id, mr_id=mr.id, note_id=note.id
                 )

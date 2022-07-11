@@ -7,7 +7,7 @@ import requests
 
 from github import GithubException, UnknownObjectException, Github
 
-from lintly.constants import LINTLY_IDENTIFIER
+from lintly.config import Config
 from lintly.formatters import (
     build_pr_review_line_comment,
     build_pr_review_body,
@@ -124,7 +124,7 @@ class GitHubBackend(BaseGitBackend):
         self.context = context
 
     def _should_delete_comment(self, comment):
-        return LINTLY_IDENTIFIER in comment.body
+        return Config.LINTLY_IDENTIFIER in comment.body
 
     @translate_github_exception
     def get_pull_request(self, pr):

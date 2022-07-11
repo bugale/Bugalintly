@@ -7,8 +7,12 @@ REDACTED = '********'
 class Config(object):
     """A Config object that knows how to return configuration from the CLI or Continuous Integration services"""
 
+    LINTLY_IDENTIFIER = '<!-- Automatically posted by Lintly -->'
+
     def __init__(self, cli_config):
         self.cli_config = cli_config
+        if self.comment_tag:
+            type(self).LINTLY_IDENTIFIER = '(%s)%s' % (self.comment_tag, type(self).LINTLY_IDENTIFIER)
 
     def as_dict(self):
         return {
@@ -22,6 +26,7 @@ class Config(object):
             'request_changes': self.request_changes,
             'github_check_run_id': self.github_check_run_id,
             'review_body': self.review_body,
+            'comment_tag': self.comment_tag,
         }
 
     @property
@@ -63,6 +68,10 @@ class Config(object):
     @property
     def review_body(self):
         return self.cli_config['review_body']
+
+    @property
+    def comment_tag(self):
+        return self.cli_config['comment_tag']
 
     @property
     def github_check_run_id(self):
