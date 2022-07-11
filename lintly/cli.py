@@ -62,6 +62,9 @@ logger = logging.getLogger(__name__)
 @click.option('--comment-tag',
               default='',
               help='A tag used to identify comments from a previous run that should be deleted')
+@click.option('--base-dir',
+              default='.',
+              help='The base git directory')
 @click.option('--exit-zero/--no-exit-zero', default=False,
               help=('Whether Lintly should exit with error code indicating '
                     'amount of violations or not. Default false'))

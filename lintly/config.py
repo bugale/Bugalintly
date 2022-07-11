@@ -8,11 +8,13 @@ class Config(object):
     """A Config object that knows how to return configuration from the CLI or Continuous Integration services"""
 
     LINTLY_IDENTIFIER = '<!-- Automatically posted by Lintly -->'
+    BASE_DIR = '.'
 
     def __init__(self, cli_config):
         self.cli_config = cli_config
         if self.comment_tag:
             type(self).LINTLY_IDENTIFIER = '(%s)%s' % (self.comment_tag, type(self).LINTLY_IDENTIFIER)
+        type(self).BASE_DIR = self.base_dir
 
     def as_dict(self):
         return {
@@ -27,6 +29,7 @@ class Config(object):
             'github_check_run_id': self.github_check_run_id,
             'review_body': self.review_body,
             'comment_tag': self.comment_tag,
+            'base_dir': self.base_dir,
         }
 
     @property
@@ -72,6 +75,10 @@ class Config(object):
     @property
     def comment_tag(self):
         return self.cli_config['comment_tag']
+
+    @property
+    def base_dir(self):
+        return self.cli_config['base_dir']
 
     @property
     def github_check_run_id(self):

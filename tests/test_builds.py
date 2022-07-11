@@ -32,6 +32,7 @@ def config(format_and_context):
         "context": format_and_context[1],
         "post_status": True,
         "comment_tag": "",
+        'base_dir': ".",
     }
 
     return Config(cli_config)
