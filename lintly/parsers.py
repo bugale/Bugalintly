@@ -61,11 +61,12 @@ class LineRegexParser(BaseLintParser):
 
             path = self._normalize_path(match.group('path'))
 
+            groups = match.groupdict()
             violation = Violation(
-                line=int(match.group('line')),
-                column=int(match.group('column')),
-                code=match.group('code'),
-                message=match.group('message')
+                line=int(groups.get('line', 1)),
+                column=int(groups.get('column', 1)),
+                code=groups.get('code', '').strip(),
+                message=groups.get('message', '').strip()
             )
 
             violations[path].append(violation)
@@ -299,4 +300,7 @@ PARSERS = {
 
     # cfn-nag JSON output
     'cfn-nag': CfnNagParser(),
+
+    # Mypy formatter
+    'mypy': LineRegexParser(r'^(?P<path>.*\.py):(?:(?P<line>\d*):)?(?:(?P<column>\d*):)? [^:]*: (?P<message>.*)$'),
 }
