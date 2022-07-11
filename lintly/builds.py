@@ -90,10 +90,10 @@ class LintlyBuild(object):
 
     def cleanup_previous_comments(self):
         logger.info('Deleting old PR review comments')
-        self.git_client.delete_pull_request_review_comments(self.config.pr)
+        self.git_client.delete_pull_request_review_comments(self.config.pr, self.config.comment_tag)
 
         logger.info('Deleting old PR comment')
-        self.git_client.delete_pull_request_comments(self.config.pr)
+        self.git_client.delete_pull_request_comments(self.config.pr, self.config.comment_tag)
 
     def find_diff_violations(self, patch):
         """
@@ -165,7 +165,8 @@ class LintlyBuild(object):
                 patch,
                 self._diff_violations,
                 pr_review_action,
-                self.config.review_body
+                self.config.review_body,
+                self.config.comment_tag
             )
             post_pr_comment = False
         except GitClientError as e:
@@ -179,7 +180,7 @@ class LintlyBuild(object):
 
         if post_pr_comment and pr_review_action in (ACTION_REVIEW_COMMENT, ACTION_REVIEW_REQUEST_CHANGES):
             logger.info('Creating PR comment')
-            comment = build_pr_comment(self.config, self.violations)
+            comment = build_pr_comment(self.violations, self.config.comment_tag)
             self.git_client.create_pull_request_comment(self.config.pr, comment)
 
     def get_result_description(self):

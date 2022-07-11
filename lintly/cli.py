@@ -59,6 +59,9 @@ logger = logging.getLogger(__name__)
               default=True,
               help=('Whether Lintly should post a PR review with a body. '
                     'The body is not removed after a re-run.'))
+@click.option('--comment-tag',
+              default='',
+              help='A tag used to identify comments from a previous run that should be deleted')
 @click.option('--exit-zero/--no-exit-zero', default=False,
               help=('Whether Lintly should exit with error code indicating '
                     'amount of violations or not. Default false'))

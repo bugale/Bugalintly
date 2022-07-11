@@ -123,8 +123,8 @@ class GitHubBackend(BaseGitBackend):
         self.client = Github(token, user_agent=GITHUB_USER_AGENT, per_page=DEFAULT_PER_PAGE)
         self.context = context
 
-    def _should_delete_comment(self, comment):
-        return LINTLY_IDENTIFIER in comment.body
+    def _should_delete_comment(self, comment, comment_tag):
+        return (LINTLY_IDENTIFIER % comment_tag) in comment.body
 
     @translate_github_exception
     def get_pull_request(self, pr):
@@ -152,11 +152,11 @@ class GitHubBackend(BaseGitBackend):
         )
 
     @translate_github_exception
-    def delete_pull_request_comments(self, pr):
+    def delete_pull_request_comments(self, pr, comment_tag):
         repo = self.client.get_repo(self.project.full_name)
         pull_request = repo.get_issue(int(pr))
         for comment in pull_request.get_comments():
-            if self._should_delete_comment(comment):
+            if self._should_delete_comment(comment, comment_tag):
                 comment.delete()
 
     def get_pr_diff(self, pr):
@@ -180,7 +180,7 @@ class GitHubBackend(BaseGitBackend):
         elif review_action == ACTION_REVIEW_APPROVE:
             return 'APPROVE'
 
-    def create_pull_request_review(self, pr, patch, all_violations, pr_review_action, has_body):
+    def create_pull_request_review(self, pr, patch, all_violations, pr_review_action, has_body, comment_tag):
         comments = []
         for file_path in all_violations:
             violations = all_violations[file_path]
@@ -192,7 +192,7 @@ class GitHubBackend(BaseGitBackend):
                     comments.append({
                         'path': file_path,
                         'position': patch_position,
-                        'body': build_pr_review_line_comment(violation)
+                        'body': build_pr_review_line_comment(violation, self, comment_tag)
                     })
 
         client = GitHubAPIClient(token=self.token)
@@ -213,7 +213,7 @@ class GitHubBackend(BaseGitBackend):
                     'comments': comments_batch,
                 }
                 if has_body:
-                    data['body'] = build_pr_review_body(all_violations)
+                    data['body'] = build_pr_review_body(all_violations, comment_tag)
 
                 url = '/repos/{owner}/{repo_name}/pulls/{pr_number}/reviews'.format(
                     owner=self.project.owner_login,
@@ -225,11 +225,11 @@ class GitHubBackend(BaseGitBackend):
                 comments_batch.clear()
 
     @translate_github_exception
-    def delete_pull_request_review_comments(self, pr):
+    def delete_pull_request_review_comments(self, pr, comment_tag):
         repo = self.client.get_repo(self.project.full_name)
         pull_request = repo.get_pull(int(pr))
         for comment in pull_request.get_review_comments():
-            if self._should_delete_comment(comment):
+            if self._should_delete_comment(comment, comment_tag):
                 comment.delete()
 
     def post_status(self, state, description, sha, target_url=''):
