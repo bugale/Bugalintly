@@ -17,22 +17,22 @@ env = Environment(
 )
 
 
-def build_pr_comment(config, violations):
+def build_pr_comment(violations, comment_tag):
     """
     Creates a Markdown representation of the comment to be posted to a pull request.
     :return: The comment
     """
     template = env.get_template('pr_comment.txt')
-    return template.render(violations=violations, LINTLY_IDENTIFIER=LINTLY_IDENTIFIER)
+    return template.render(violations=violations, LINTLY_IDENTIFIER=(LINTLY_IDENTIFIER % comment_tag))
 
 
-def build_pr_review_line_comment(violation):
+def build_pr_review_line_comment(violation, comment_tag):
     """
     Creates a Markdown representation of the comment to be posted to a pull request.
     :return: The comment
     """
     template = env.get_template('pr_review_line_comment.txt')
-    return template.render(violation=violation, LINTLY_IDENTIFIER=LINTLY_IDENTIFIER)
+    return template.render(violation=violation, LINTLY_IDENTIFIER=(LINTLY_IDENTIFIER % comment_tag))
 
 
 def build_check_line_comment(violation):
@@ -40,6 +40,6 @@ def build_check_line_comment(violation):
     return template.render(violation=violation)
 
 
-def build_pr_review_body(violations):
+def build_pr_review_body(violations, comment_tag):
     template = env.get_template('pr_review_body.txt')
-    return template.render(violations=violations, LINTLY_IDENTIFIER=LINTLY_IDENTIFIER)
+    return template.render(violations=violations, LINTLY_IDENTIFIER=(LINTLY_IDENTIFIER % comment_tag))

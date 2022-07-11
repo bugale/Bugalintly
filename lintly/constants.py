@@ -4,7 +4,7 @@ FAIL_ON_NEW = 'new'
 # Identifies that a comment came from Lintly. This is used to aid in automatically
 # deleting old PR comments/reviews. This is valid Markdown that is hidden from
 # users in GitHub and GitLab.
-LINTLY_IDENTIFIER = '<!-- Automatically posted by Lintly -->'
+LINTLY_IDENTIFIER = '<!-- Automatically posted by Lintly %s -->'
 
 # These constants define the actions that lintly might take against a PR concerning reviews, ie.
 # not the commit status
