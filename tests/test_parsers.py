@@ -2,12 +2,8 @@ import abc
 import os
 import unittest
 
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
-
 from lintly.parsers import PARSERS
+from lintly.config import Config
 
 
 class ParserTestCaseMixin(object):
@@ -57,6 +53,7 @@ class ParserTestCaseMixin(object):
             return linter_output.read()
 
     def setUp(self):
+        Config.BASE_DIR = '.'
         self.linter_output = self.load_linter_output(self.linter_output_file_name)
 
     def test_parse_violations(self):
@@ -137,8 +134,8 @@ class ESLintParserTestCase(ParserTestCaseMixin, unittest.TestCase):
         ]
     }
 
-    @patch('lintly.parsers.ESLintParser._get_working_dir', return_value='/Users/grant/project')
-    def test_parse_violations(self, _get_working_dir_mock):
+    def test_parse_violations(self):
+        Config.BASE_DIR = '/Users/grant/project'
         super(ESLintParserTestCase, self).test_parse_violations()
 
 
@@ -168,8 +165,8 @@ class BlackParserTestCase(ParserTestCaseMixin, unittest.TestCase):
         for file_path in ['lintly/violations.py', 'lintly/parsers.py']
     }
 
-    @patch('lintly.parsers.BlackParser._get_working_dir', return_value='/Users/jouyuy/Dev/workspace/Lintly')
-    def test_parse_violations(self, _get_working_dir_mock):
+    def test_parse_violations(self):
+        Config.BASE_DIR = '/Users/jouyuy/Dev/workspace/Lintly'
         super(BlackParserTestCase, self).test_parse_violations()
 
 

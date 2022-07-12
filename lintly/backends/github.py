@@ -7,7 +7,7 @@ import requests
 
 from github import GithubException, UnknownObjectException, Github
 
-from lintly.constants import LINTLY_IDENTIFIER
+from lintly.config import Config
 from lintly.formatters import (
     build_pr_review_line_comment,
     build_pr_review_body,
@@ -124,7 +124,7 @@ class GitHubBackend(BaseGitBackend):
         self.context = context
 
     def _should_delete_comment(self, comment):
-        return LINTLY_IDENTIFIER in comment.body
+        return Config.LINTLY_IDENTIFIER in comment.body
 
     @translate_github_exception
     def get_pull_request(self, pr):
@@ -180,7 +180,7 @@ class GitHubBackend(BaseGitBackend):
         elif review_action == ACTION_REVIEW_APPROVE:
             return 'APPROVE'
 
-    def create_pull_request_review(self, pr, patch, all_violations, pr_review_action):
+    def create_pull_request_review(self, pr, patch, all_violations, pr_review_action, has_body):
         comments = []
         for file_path in all_violations:
             violations = all_violations[file_path]
@@ -209,10 +209,11 @@ class GitHubBackend(BaseGitBackend):
             # there are no pending comments to add then we send the request
             if len(comments_batch) == GITHUB_PULL_REQUEST_COMMENT_LIMIT or not comments:
                 data = {
-                    'body': build_pr_review_body(all_violations),
                     'event': self._get_event(pr_review_action),
                     'comments': comments_batch,
                 }
+                if has_body:
+                    data['body'] = build_pr_review_body(all_violations)
 
                 url = '/repos/{owner}/{repo_name}/pulls/{pr_number}/reviews'.format(
                     owner=self.project.owner_login,

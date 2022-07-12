@@ -8,6 +8,7 @@ import os
 import re
 
 from .violations import Violation
+from .config import Config
 
 
 class BaseLintParser(object):
@@ -15,15 +16,15 @@ class BaseLintParser(object):
     def parse_violations(self, output):
         raise NotImplementedError
 
-    def _get_working_dir(self):
-        return os.getcwd()
-
     def _normalize_path(self, path):
         """
         Normalizes a file path so that it returns a path relative to the root repo directory.
         """
         norm_path = os.path.normpath(path)
-        return os.path.relpath(norm_path, start=self._get_working_dir())
+        rel_path = os.path.relpath(norm_path, start=Config.BASE_DIR)
+        if os.name == 'nt':
+            rel_path = rel_path.replace('\\', '/')
+        return rel_path
 
 
 class LineRegexParser(BaseLintParser):
@@ -58,11 +59,12 @@ class LineRegexParser(BaseLintParser):
 
             path = self._normalize_path(match.group('path'))
 
+            groups = match.groupdict()
             violation = Violation(
-                line=int(match.group('line')),
-                column=int(match.group('column')),
-                code=match.group('code'),
-                message=match.group('message')
+                line=int(groups.get('line') or 1),
+                column=int(groups.get('column') or 1),
+                code=(groups.get('code') or '[empty]').strip(),
+                message=(groups.get('message') or '[empty]').strip()
             )
 
             violations[path].append(violation)
@@ -296,4 +298,8 @@ PARSERS = {
 
     # cfn-nag JSON output
     'cfn-nag': CfnNagParser(),
+
+    # Mypy formatter
+    'mypy': LineRegexParser(r'^(?P<path>.*\.py):(?:(?P<line>\d*):)?(?:(?P<column>\d*):)? [^:]*: '
+                            r'(?P<message>.*?)(?:\[(?P<code>\S*)\])?$'),
 }
