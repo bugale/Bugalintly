@@ -67,6 +67,8 @@ def main(**options):
 
     click.echo(stdin_text)
 
+    click.echo('I\'m Bugalintly, what do you need?')
+
     config = Config(options)
 
     build = LintlyBuild(config, stdin_text)
